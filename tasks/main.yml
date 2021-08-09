@@ -1,0 +1,93 @@
+---
+# tasks file for nexus-iq-server
+- name: print the distribution and version
+  debug: msg="{{ ansible_distribution }} {{ ansible_distribution_version }}"
+
+- name: ensure iqserver user exists
+  user:
+    name: "{{ iqserver_user }}"
+    state: present
+    system: true
+
+- name: Create nexus-iq-server-directory if it does not exist
+  file:
+    path: "{{ iqserver_base_dir }}"
+    state: directory
+    owner: "{{ iqserver_user }}"
+    group: "{{ iqserver_user }}"
+    mode: '0750'
+
+- name: Download nexus-iq-server version 1.121.0-01
+  get_url:
+    url: "{{iqserver_download_base_url}}/nexus-iq-server-{{iqserver_version}}-bundle.tar.gz"
+    dest: /opt/nexus-iq-server/latest.tar.gz
+
+- name: Unarchive nexus-iq-server package
+  unarchive:
+    src: /opt/nexus-iq-server/latest.tar.gz
+    dest: /opt/nexus-iq-server
+    owner: "{{ iqserver_user }}"
+    group: "{{ iqserver_user }}"
+    remote_src: yes
+
+
+- name: ensure that the data dir exists
+  file:
+    dest: "/opt/sonatype-work/clm-server"
+    owner: "{{ iqserver_user }}"
+    group: "{{ iqserver_user }}"
+    mode: "0750"
+    state: directory
+
+- name: Copy a nexus-iq-server license
+  copy:
+    src: "{{ iqserver_license_path }}/{{iqserver_license}}"
+    dest: "/opt/sonatype-work/clm-server/{{iqserver_license}}"
+    owner: "{{ iqserver_user }}"
+    group: "{{ iqserver_user }}"
+
+- name: put nexus-iq-server init.d script
+  template:
+    src: "etc.init.d.nexus-iq-server.j2"
+    dest: "/etc/init.d/nexus-iq-server"
+    owner: "{{ iqserver_user }}"
+    group: "{{ iqserver_user }}"
+    mode: "0755"
+
+- name: generate system limits config
+  template:
+    src: "etc.security.limits.d.99-iqserver.conf.j2"
+    dest: "/etc/security/limits.d/99-iqserver.conf"
+    owner: "{{ iqserver_user }}"
+    group: "{{ iqserver_user }}"
+    mode: "0640"
+  notify:
+    - reload systemd
+
+- name: generate iqserver config
+  template:
+    src: "config.yml.j2"
+    dest: "{{ iqserver_base_dir }}/config.yml"
+    owner: "{{ iqserver_user }}"
+    group: "{{ iqserver_user }}"
+    mode: "0640"
+  notify:
+    - reload systemd
+    - restart iqserver
+
+- name: generate iqserver systemd service unit
+  template:
+    src: "etc.systemd.system.nexus-iq-server.service.j2"
+    dest: "/etc/systemd/system/nexus-iq-server.service"
+    owner: "{{ iqserver_user }}"
+    group: "{{ iqserver_user }}"
+    mode: "0644"
+  notify:
+    - reload systemd
+    - restart iqserver
+
+- name: ensure the iqserver service has started
+  service:
+    name: nexus-iq-server
+    enabled: yes
+    state: started

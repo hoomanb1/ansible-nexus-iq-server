@@ -1,0 +1,20 @@
+---
+  iqserver_license_path: ""
+  iqserver_license: ""
+  iqserver_base_url: http://localhost:8070
+  iqserver_create_sample_data: false
+  iqserver_user: iqserver
+  iqserver_base_dir: /opt/nexus-iq-server
+  iqserver_base_log_level: ALL
+  iqserver_use_nginx: false
+  iqserver_enable_jira_integration: false
+  iqserver_jira_server: ""
+  iqserver_jira_username: ""
+  iqserver_jira_api_token: ""
+  iqserver_enable_rut: false
+  iqserver_rut_username_header: ""
+  iqserver_rut_logout_url: ""
+  iqserver_external_database: false
+  iqserver_download_base_url: "https://download.sonatype.com/clm/server"
+  iqserver_version: 1.121.0-01
+
