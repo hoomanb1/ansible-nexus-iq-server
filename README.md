@@ -6,7 +6,7 @@ An ansible role for installing and managing [Nexus IQ Server](https://help.sonat
 
 ```
 ---
-- hosts: home-pc
+- hosts: iq-box
   become: yes
   roles:
     - nexus-iq-server
