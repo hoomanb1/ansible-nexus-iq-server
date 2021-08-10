@@ -1,4 +1,4 @@
-# Nexus IQ Server Ansible roles
+# Nexus IQ Server Ansible role
 
 An ansible role for installing and managing [Nexus IQ Server](https://help.sonatype.com/iqserver). The role installs IQ Server on Unix based platforms.
 
